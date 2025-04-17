@@ -190,6 +190,18 @@
   <section class="visualizations">
       <div class="viz-card">
         <h3>Premier League Team Trends (2014–2023)</h3>
+        <p>
+        This interactive line chart visualizes the seasonal performance of top Premier League teams from 2014 to 2023. It helps users explore trends in key metrics like league position, total points, goals scored, and wins.
+        </p>
+        <p>
+        <b>Data Processing:</b> Team performance data is aggregated per season from the original Premier League standings CSV. The metrics are dynamically extracted and rendered using D3’s line generator. Teams are grouped based on frequency of appearance and prominence (e.g., the Big 6).
+        </p>
+        <p>
+        <b>How to Use:</b> Use the dropdown to change the metric being visualized (e.g., position, points, goals). Click on a team in the legend to toggle its visibility. Use the buttons to show all, highlight the Big 6, or reset.
+        </p>
+        <p>
+        <b>Data Source:</b> Processed from <a href="https://www.football-data.co.uk/" target="_blank">football-data.co.uk</a> (1993–2024). Custom logic written in Python and D3 to group and filter teams.
+        </p>
         <div style="margin-bottom: 1rem;">
           <div style="margin-bottom: 1rem;">
             <button id="show-all">Show All</button>
@@ -210,7 +222,20 @@
     </div>
 
     <div class="viz-card">
-      <h3>Relegation and Return Flow (Dynamic Grouping)</h3>
+      <h3>Relegation and Return Flow</h3>
+<p>
+This Sankey diagram tracks teams that entered the relegation zone and their long-term outcomes—whether they returned to the league, survived, or remained relegated. It reveals patterns in promotion and survival across grouped seasons.
+</p>
+<p>
+<b>Data Processing:</b> Weekly rankings were simulated from match-level data to identify teams in the relegation zone (positions 18–20). Final standings were used to label teams as relegated or not. Grouping logic aggregates these into intervals (e.g., every 4 seasons).
+</p>
+<p>
+<b>How to Use:</b> Adjust the grouping slider to change how seasons are bundled. Hover over links to see team counts and transition flows. Each node and path reflects the outcome of teams during and after relegation.
+</p>
+<p>
+<b>Data Source:</b> Derived from match results data from <a href="https://www.football-data.co.uk/" target="_blank">football-data.co.uk</a> and custom relegation logic. Visualization adapted from the official <a href="https://observablehq.com/@d3/sankey-diagram" target="_blank">D3 Sankey example</a>.
+</p>
+
       <div class="slider-container">
         <label for="group-slider"><strong>Group by window (years): </strong></label>
         <input type="range" id="group-slider" min="2" max="8" value="4" step="1">
@@ -228,7 +253,19 @@
 
     <div class="viz-card">
       <h3>Home vs Away Win Balance (UK Map)</h3>
-      <p>Bubbles show teams with a home/away win imbalance. Red = home-dominant, Blue = away-dominant.</p>
+<p>
+This geographical map uses bubbles to represent the imbalance between home and away wins for each club. The map reflects team location and home-ground advantage or weakness over multiple seasons.
+</p>
+<p>
+<b>Data Processing:</b> Home and away wins were tallied for each club from the match-level data. The net win difference was calculated (Home Wins – Away Wins), and mapped to size and color using a diverging scale (red = home dominance, blue = away dominance).
+</p>
+<p>
+<b>How to Use:</b> Hover over a bubble to see home and away win totals. Click on a bubble to open a line chart showing that team’s win imbalance trend season-by-season.
+</p>
+<p>
+<b>Data Source:</b> Match results parsed from <a href="https://www.football-data.co.uk/" target="_blank">football-data.co.uk</a>. Club coordinates were manually mapped based on stadium locations.
+</p>
+
       <div id="viz3" class="viz-container" style="height: 600px; position: relative;"></div>
       <div class="viz-card" id="club-line-card" style="display:none;">
         <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
