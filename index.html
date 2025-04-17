@@ -200,7 +200,8 @@
         <b>How to Use:</b> Use the dropdown to change the metric being visualized (e.g., position, points, goals). Click on a team in the legend to toggle its visibility. Use the buttons to show all, highlight the Big 6, or reset.
         </p>
         <p>
-        <b>Data Source:</b> Processed from <a href="https://www.football-data.co.uk/" target="_blank">football-data.co.uk</a> (1993–2024). Custom logic written in Python and D3 to group and filter teams.
+          <b>Data Processing:</b> Raw season-level CSV data is parsed directly in-browser using D3.js. Top teams are determined based on their appearance frequency. The selected metric is dynamically applied to draw lines for each team using D3’s line generator. No external preprocessing was used—everything is computed and rendered interactively on the client side.Visualization adapted from the multi-series line chart example on Observable: <a href="https://observablehq.com/@d3/multi-line-chart" target="_blank">Multi-Line Chart Example</a>. Interaction and team filtering features have been customized for the Premier League dataset.
+
         </p>
         <div style="margin-bottom: 1rem;">
           <div style="margin-bottom: 1rem;">
@@ -263,7 +264,8 @@ This geographical map uses bubbles to represent the imbalance between home and a
 <b>How to Use:</b> Hover over a bubble to see home and away win totals. Click on a bubble to open a line chart showing that team’s win imbalance trend season-by-season.
 </p>
 <p>
-<b>Data Source:</b> Match results parsed from <a href="https://www.football-data.co.uk/" target="_blank">football-data.co.uk</a>. Club coordinates were manually mapped based on stadium locations.
+<b>Data Source:</b> Match results parsed from <a href="https://www.football-data.co.uk/" target="_blank">football-data.co.uk</a>. Club coordinates were manually mapped based on stadium locations.Map rendering adapted from D3’s UK map projection and bubble overlay examples: <a href="https://observablehq.com/@d3/bubble-map" target="_blank">Bubble Map Example</a>. Stadium coordinates were manually mapped and win balance logic implemented from scratch.
+
 </p>
 
       <div id="viz3" class="viz-container" style="height: 600px; position: relative;"></div>
