@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>D3 Visualizations - Saksham</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
+
+ <style>
+    body {
+      margin: 0;
+      font-family: 'Open Sans', sans-serif;
+      background: #f9f9f9;
+      color: #333;
+    }
+    header {
+      padding: 2rem;
+      text-align: center;
+      background: #000;
+      color: white;
+    }
+    .visualizations {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      max-width: 1000px;
+      margin: auto;
+      text-align: center;
+    }
+    .viz-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 2rem;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .viz-card h3 {
+      margin-top: 0;
+    }
+    .viz-container {
+      width: 100%;
+      height: 300px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .tooltip {
+      position: absolute;
+      background: #fff;
+      padding: 6px 10px;
+      border: 1px solid #999;
+      border-radius: 4px;
+      pointer-events: none;
+      font-size: 13px;
+      z-index: 10;
+    }
+    .slider-container {
+      margin: 1rem 0;
+    }
+    .legend {
+      margin-top: 1rem;
+      text-align: left;
+      align-self: flex-start;
+      font-size: 14px;
+    }
+    .legend span {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-right: 8px;
+      border-radius: 3px;
+    }
+    @import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
+
+
+.landing {
+  width: 100vw;
+  min-height: 50vh;
+  background: #003140;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing .img {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.landing .img img {
+  max-width: 100%;
+  height: auto;
+}
+
+.landing .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing .container .h1 {
+  background: #003140;
+  padding: 20px 15px;
+  border-radius: 10px;
+  box-shadow: 3px 3px 15px #025872a2, -3px -3px 15px #000,
+              inset 3px 3px 10px #ffffff10, inset -3px -3px 15px #00000033;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.landing .container .h1 a {
+  font-size: 1em;
+  color: black;
+  background: white;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: -5px -5px 5px #ffffff3d, 5px 5px 10px #00000059;
+  text-decoration: none;
+}
+
+.typed-wrapper {
+  font-size: 1.2em;
+  text-align: center;
+  margin-top: -10px;
+}
+
+#typed {
+  margin-left: 5px;
+}
+
+.footer {
+  background: #080808;
+  text-align: center;
+  color: whitesmoke;
+  width: 100%;
+  padding-top: 100px;
+  padding-bottom: 40px;
+}
+
+.footer a {
+  color: #1eff00;
+}
+
+
+
+
+@keyframes cursor {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="landing">
+    <div class="img"><img src="football.gif" alt="" /></div>
+    <div class="container">
+      <div class="h1" data-aos="zoom-in-up" data-aos-duration="3000">
+        <h1>
+          <a>English Premier League</a>
+        </h1>
+      </div>
+      <div class="typed-wrapper">
+        <div id="typed-strings">
+          <p>Statistics</p>
+          <p>Goals</p>
+          <p>Matches</p>
+          <p>Football</p>
+        </div>
+        <span id="typed"></span>
+      </div>
+    </div>
+    </div>
+</div>
+
+  <section class="visualizations">
+      <div class="viz-card">
+        <h3>Premier League Team Trends (2014–2023)</h3>
+        <div style="margin-bottom: 1rem;">
+          <div style="margin-bottom: 1rem;">
+            <button id="show-all">Show All</button>
+            <button id="show-top6">Show Top 6</button>
+            <button id="hide-all">Hide All</button>
+          </div>
+          <label for="metric-select">Select Metric:</label>
+          <select id="metric-select">
+            <option value="position">Position</option>
+            <option value="points">Points</option>
+            <option value="gd">Goal Difference</option>
+            <option value="won">Wins</option>
+            <option value="gf">Goals For</option>
+            <option value="ga">Goals Against</option>
+          </select>
+        </div>
+        <div id="viz1" class="viz-container" style="height: 500px;"></div>
+    </div>
+
+    <div class="viz-card">
+      <h3>Relegation and Return Flow (Dynamic Grouping)</h3>
+      <div class="slider-container">
+        <label for="group-slider"><strong>Group by window (years): </strong></label>
+        <input type="range" id="group-slider" min="2" max="8" value="4" step="1">
+        <span id="slider-value">4</span> years
+      </div>
+      <svg id="viz2" width="1000" height="500" style="margin-bottom: 1rem;"></svg>
+      <div class="tooltip tooltip2" id="sankey-tooltip" style="opacity: 0;"></div>
+      <div class="legend">
+        <div><span style="background:#ff7f0e;"></span> Relegation Group</div>
+        <div><span style="background:#2ca02c;"></span> Survived</div>
+        <div><span style="background:#1f77b4;"></span> Returned</div>
+        <div><span style="background:#888;"></span> Never Returned</div>
+      </div>
+    </div>
+
+    <div class="viz-card">
+      <h3>Home vs Away Win Balance (UK Map)</h3>
+      <p>Bubbles show teams with a home/away win imbalance. Red = home-dominant, Blue = away-dominant.</p>
+      <div id="viz3" class="viz-container" style="height: 600px; position: relative;"></div>
+      <div class="viz-card" id="club-line-card" style="display:none;">
+        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+          <h3 id="club-line-title">Club Season Win Balance</h3>
+          <button onclick="closeClubChart()" style="padding: 6px 12px; font-size: 14px;">Close ✕</button>
+        </div>
+        <svg id="club-line-chart" width="800" height="300"></svg>
+      </div>
+      
+  </section>
+  <footer>
+    <div class="footer"> Site By <a href="https://sakshamchecker.coM">Saksham Checker</a><br><br>
+    </div>
+</footer>
+  <script>
+    const big6 = ['Manchester Utd', 'Manchester City', 'Arsenal', 'Chelsea', 'Liverpool', 'Tottenham'];
+    
+    const metrics = {
+      position: "Position",
+      points: "Points",
+      gd: "Goal Difference",
+      won: "Wins",
+      gf: "Goals For",
+      ga: "Goals Against"
+    };
+    
+    const margin = { top: 50, right: 150, bottom: 50, left: 80 };
+    width = 800 - margin.left - margin.right,
+      height = 450 - margin.top - margin.bottom;
+    
+    const svg = d3.select("#viz1")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right + 100)
+      .attr("height", height + margin.top + margin.bottom + 20)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+    const tooltip = d3.select("#viz1")
+      .append("div")
+      .style("position", "absolute")
+      .style("padding", "6px 10px")
+      .style("background", "#fff")
+      .style("border", "1px solid #ccc")
+      .style("border-radius", "5px")
+      .style("pointer-events", "none")
+      .style("font-size", "12px")
+      .style("display", "none");
+    
+    const color = d3.scaleOrdinal(d3.schemeTableau10);
+    
+    d3.csv("pl-tables-1993-2024.csv").then(data => {
+      data.forEach(d => {
+        d.season_end_year = +d.season_end_year;
+        d.position = +d.position;
+        d.points = +d.points;
+        d.gd = +d.gd;
+        d.won = +d.won;
+        d.gf = +d.gf;
+        d.ga = +d.ga;
+      });
+    
+      const filtered = data.filter(d => d.season_end_year >= 2014);
+      const topTeams = d3.rollups(filtered, v => v.length, d => d.team)
+        .sort((a, b) => d3.descending(a[1], b[1]))
+        .slice(0, 20)
+        .map(d => d[0]);
+      const teams = Array.from(new Set([...topTeams, ...big6]));
+      const teamData = {};
+      teams.forEach(team => {
+        teamData[team] = filtered.filter(d => d.team === team);
+      });
+    
+      const x = d3.scaleLinear()
+        .domain(d3.extent(filtered, d => d.season_end_year))
+        .range([0, width]);
+    
+      svg.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+    
+      const y = d3.scaleLinear().range([height, 0]);
+      const yAxis = svg.append("g");
+    
+      const xLabel = svg.append("text")
+        .attr("class", "x-axis-label")
+        .attr("text-anchor", "middle")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .text("Season End Year");
+    
+      const yLabel = svg.append("text")
+        .attr("class", "y-axis-label")
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .text("Position");
+    
+      const line = d3.line()
+        .x(d => x(d.season_end_year))
+        .y(d => y(d.value));
+    
+      const linesGroup = svg.append("g").attr("class", "lines");
+      const dotsGroup = svg.append("g").attr("class", "dots");
+      const legendGroup = svg.append("g").attr("transform", `translate(${width + 20},0)`);
+    
+      const activeTeams = new Set(big6); // default
+    
+      function update(metricKey) {
+        const metricLabel = metrics[metricKey];
+        yLabel.text(metricLabel);
+    
+        const allValues = teams.flatMap(team => teamData[team].map(d => d[metricKey]));
+        const [minY, maxY] = d3.extent(allValues.filter(v => v != null));
+        y.domain(metricKey === "position" ? [maxY, minY] : [minY, maxY]);
+        yAxis.transition().duration(500).call(d3.axisLeft(y));
+    
+        const lines = linesGroup.selectAll(".line").data(teams, d => d);
+        lines.enter()
+          .append("path")
+          .attr("class", "line")
+          .merge(lines)
+          .transition().duration(800)
+          .attr("fill", "none")
+          .attr("stroke", d => color(d))
+          .attr("stroke-width", d => big6.includes(d) ? 2.5 : 1.5)
+          .attr("stroke-dasharray", d => big6.includes(d) ? "0" : "4 3")
+          .attr("opacity", d => activeTeams.has(d) ? 1 : 0)
+          .attr("d", d => {
+            const values = teamData[d].map(p => ({ season_end_year: p.season_end_year, value: p[metricKey] }));
+            return line(values);
+          });
+    
+        const dotData = [];
+        teams.forEach(team => {
+          if (!activeTeams.has(team)) return;
+          teamData[team].forEach(d => {
+            if (d[metricKey] != null) {
+              dotData.push({
+                x: d.season_end_year,
+                y: d[metricKey],
+                team: team
+              });
+            }
+          });
+        });
+    
+        const dots = dotsGroup.selectAll("circle").data(dotData);
+        dots.exit().remove();
+        dots.enter().append("circle")
+          .merge(dots)
+          .transition().duration(500)
+          .attr("cx", d => x(d.x))
+          .attr("cy", d => y(d.y))
+          .attr("r", 4)
+          .attr("fill", d => color(d.team))
+          .attr("opacity", 0.8);
+    
+        dotsGroup.selectAll("circle")
+          .on("mouseover", (event, d) => {
+            tooltip
+              .style("left", (event.pageX + 10) + "px")
+              .style("top", (event.pageY - 20) + "px")
+              .style("display", "block")
+              .html(`<strong>${d.team}</strong><br>Season: ${d.x}<br>${metricLabel}: ${d.y}`);
+          })
+          .on("mouseout", () => {
+            tooltip.style("display", "none");
+          });
+      }
+    
+      // Create legend
+      legendGroup.selectAll("text")
+        .data(teams)
+        .enter()
+        .append("text")
+        .attr("y", (d, i) => i * 20)
+        .attr("x", 0)
+        .text(d => d)
+        .style("font-size", "12px")
+        .style("cursor", "pointer")
+        .attr("fill", d => activeTeams.has(d) ? color(d) : "#999")
+        .on("click", function(event, d) {
+          if (activeTeams.has(d)) activeTeams.delete(d);
+          else activeTeams.add(d);
+          d3.select(this).attr("fill", activeTeams.has(d) ? color(d) : "#999");
+          update(d3.select("#metric-select").property("value"));
+        });
+    
+      // Initial chart
+      update("position");
+    
+      d3.select("#metric-select").on("change", function () {
+        const selected = d3.select(this).property("value");
+        update(selected);
+      });
+    
+      // Buttons
+      d3.select("#show-all").on("click", () => {
+        teams.forEach(team => activeTeams.add(team));
+        legendGroup.selectAll("text")
+          .attr("fill", d => color(d));
+        update(d3.select("#metric-select").property("value"));
+      });
+    
+      d3.select("#show-top6").on("click", () => {
+        activeTeams.clear();
+        big6.forEach(team => activeTeams.add(team));
+        legendGroup.selectAll("text")
+          .attr("fill", d => activeTeams.has(d) ? color(d) : "#999");
+        update(d3.select("#metric-select").property("value"));
+      });
+    
+      d3.select("#hide-all").on("click", () => {
+        activeTeams.clear();
+        legendGroup.selectAll("text").attr("fill", "#999");
+        update(d3.select("#metric-select").property("value"));
+      });
+    });
+    </script>
+    <script>
+const sankeySvg = d3.select("#viz2");
+const tooltip2 = d3.select("#sankey-tooltip");
+const groupSlider = d3.select("#group-slider");
+const sliderValue = d3.select("#slider-value");
+
+d3.csv("premier-league-matches.csv", d3.autoType).then(data => {
+  const matches = [];
+  data.forEach(d => {
+    if (!d.FTR || !d.Home || !d.Away || isNaN(d.HomeGoals) || isNaN(d.AwayGoals)) return;
+    const season = +d.Season_End_Year;
+    const week = +d.Wk;
+    matches.push({
+      season, week, team: d.Home.trim(),
+      goals_for: +d.HomeGoals,
+      goals_against: +d.AwayGoals,
+      points: d.FTR === "H" ? 3 : d.FTR === "D" ? 1 : 0
+    });
+    matches.push({
+      season, week, team: d.Away.trim(),
+      goals_for: +d.AwayGoals,
+      goals_against: +d.HomeGoals,
+      points: d.FTR === "A" ? 3 : d.FTR === "D" ? 1 : 0
+    });
+  });
+
+  function render(groupSize = 4) {
+    sankeySvg.selectAll("*").remove();
+
+    const seasonWeeks = d3.rollup(matches, v => d3.max(v, d => d.week), d => d.season);
+    const table = [];
+
+    for (const [season, maxWeek] of seasonWeeks.entries()) {
+      for (let wk = 1; wk <= maxWeek; wk++) {
+        const upTo = matches.filter(m => m.season === season && m.week <= wk);
+        const stats = d3.rollups(upTo, teamGames => {
+          const pts = d3.sum(teamGames, d => d.points);
+          const gf = d3.sum(teamGames, d => d.goals_for);
+          const ga = d3.sum(teamGames, d => d.goals_against);
+          return { pts, gf, ga, gd: gf - ga };
+        }, d => d.team).map(([team, s]) => ({ season, week: wk, team, ...s }));
+
+        stats.sort((a, b) =>
+          d3.descending(a.pts, b.pts) || d3.descending(a.gd, b.gd) || d3.descending(a.gf, b.gf)
+        );
+        stats.forEach((d, i) => d.position = i + 1);
+        table.push(...stats);
+      }
+    }
+
+    const flags = d3.rollups(table,
+      rows => ({
+        in_zone: rows.some(r => r.position >= 18),
+        final_pos: rows[rows.length - 1].position
+      }),
+      d => d.season,
+      d => d.team
+    );
+
+    const flat = [];
+    for (const [season, teams] of flags) {
+      for (const [team, vals] of teams) {
+        flat.push({
+          season, team,
+          in_zone: vals.in_zone,
+          relegated: vals.final_pos >= 18
+        });
+      }
+    }
+
+    const groupSeason = s => {
+      const start = Math.floor(s / groupSize) * groupSize;
+      return `${start}–${start + groupSize - 1}`;
+    };
+
+    const teamMap = d3.group(flat, d => d.team);
+
+    const relegated = flat.filter(d => d.in_zone && d.relegated).map(d => {
+      const later = teamMap.get(d.team).filter(e => e.season > d.season);
+      const comeback = later.find(e => !e.relegated);
+      return {
+        team: d.team,
+        relegation_group: groupSeason(d.season),
+        return_group: comeback ? `Returned ${groupSeason(comeback.season)}` : "Never Returned"
+      };
+    });
+
+    const survived = flat.filter(d => d.in_zone && !d.relegated).map(d => ({
+      team: d.team,
+      relegation_group: groupSeason(d.season)
+    }));
+
+    const relGroups = Array.from(new Set([...relegated.map(d => d.relegation_group), ...survived.map(d => d.relegation_group)])).sort();
+    const retGroups = Array.from(new Set(relegated.map(d => d.return_group))).sort((a, b) => {
+      if (a === "Never Returned") return 1;
+      if (b === "Never Returned") return -1;
+      return d3.ascending(a, b);
+    });
+
+    const allLabels = [...relGroups, "Survived", ...retGroups];
+    const labelIndex = new Map(allLabels.map((d, i) => [d, i]));
+    const nodeCounts = new Map();
+    const links = [];
+
+    for (const g of relGroups) {
+      const surv = survived.filter(d => d.relegation_group === g);
+      nodeCounts.set(g, (nodeCounts.get(g) || 0) + surv.length);
+      nodeCounts.set("Survived", (nodeCounts.get("Survived") || 0) + surv.length);
+      if (surv.length)
+        links.push({
+          source: labelIndex.get(g),
+          target: labelIndex.get("Survived"),
+          value: surv.length,
+          label: `${surv.length} team(s) from ${g} survived`
+        });
+
+      const rel = relegated.filter(d => d.relegation_group === g);
+      const groupings = d3.group(rel, d => d.return_group);
+      for (const [ret, group] of groupings) {
+        nodeCounts.set(g, (nodeCounts.get(g) || 0) + group.length);
+        nodeCounts.set(ret, (nodeCounts.get(ret) || 0) + group.length);
+        links.push({
+          source: labelIndex.get(g),
+          target: labelIndex.get(ret),
+          value: group.length,
+          label: `${group.length} team(s) relegated in ${g} returned in ${ret}`
+        });
+      }
+    }
+
+    if (links.length === 0) {
+      sankeySvg.append("text").attr("x", 50).attr("y", 80)
+        .text("Not enough data for this grouping.")
+        .attr("font-size", "16px");
+      return;
+    }
+
+    const sankey = d3.sankey()
+      .nodeWidth(20)
+      .nodePadding(20)
+      .extent([[1, 1], [1000 - 1, 500 - 1]]);
+
+    const graph = sankey({
+      nodes: allLabels.map(name => ({ name })),
+      links: links.map(d => ({ ...d }))
+    });
+
+    const colorScale = name => {
+      if (name === "Survived") return "#2ca02c";
+      if (name.startsWith("Returned")) return "#1f77b4";
+      if (name === "Never Returned") return "#888";
+      if (/^\\d{4}–\\d{4}$/.test(name)) return "#ff7f0e";
+      return "#999";
+    };
+
+    
+    sankeySvg.append("g")
+  .selectAll("path")
+  .data(graph.links)
+  .join("path")
+  .attr("d", d3.sankeyLinkHorizontal())
+  .attr("stroke", "#aaa")
+  .attr("stroke-width", d => Math.max(1, d.width))
+  .attr("fill", "none")
+  .on("mouseover", (event, d) => {
+    tooltip2
+      .style("opacity", 1)
+      .html(d.label)
+      .style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 20) + "px");
+  })
+  .on("mousemove", (event) => {
+    tooltip2
+      .style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 20) + "px");
+  })
+  .on("mouseout", () => {
+    tooltip2.transition().duration(300).style("opacity", 0);
+  });
+    sankeySvg.append("g")
+      .selectAll("rect")
+      .data(graph.nodes)
+      .join("rect")
+      .attr("x", d => d.x0)
+      .attr("y", d => d.y0)
+      .attr("height", d => d.y1 - d.y0)
+      .attr("width", d => d.x1 - d.x0)
+      .attr("fill", d => colorScale(d.name))
+      .attr("stroke", "#000");
+
+    sankeySvg.append("g")
+      .selectAll("text")
+      .data(graph.nodes)
+      .join("text")
+      .attr("x", d => d.x0 < 500 ? d.x1 + 6 : d.x0 - 6)
+      .attr("y", d => (d.y0 + d.y1) / 2)
+      .attr("text-anchor", d => d.x0 < 500 ? "start" : "end")
+      .attr("dy", "0.35em")
+      .text(d => `${d.name} (${nodeCounts.get(d.name) || 0})`);
+  }
+
+  render(+groupSlider.property("value"));
+  groupSlider.on("input", () => {
+    const val = +groupSlider.property("value");
+    sliderValue.text(val);
+    render(val);
+  });
+});
+
+
+    </script>
+    
+  </script>
+  <script>
+   const width1 = 960;
+      const height1 = 600;
+
+    
+      
+      const svg3 = d3.select("#viz3")
+        .append("svg");
+
+      
+      svg3.attr("width", width1)
+      .attr("height", height1)
+
+
+      const tooltip3 = d3.select("body")
+        .append("div")
+        .attr("class", "tooltip tooltip3")
+        .style("opacity", 0);
+      
+        const projection = d3.geoMercator()
+        .center([-1.5, 53.0])       
+        .scale(3000)                
+        .translate([width1 / 2, height1 / 2 + 50]); 
+      const path = d3.geoPath().projection(projection);
+      
+      const color3 = d3.scaleDiverging()
+        .interpolator(d3.interpolateRdBu)
+        .domain([50, 0, -50]);
+      
+      const radius = d3.scaleSqrt().domain([0, 100]).range([0, 18]);
+      
+      const teamCoords = {
+        'Manchester Utd': [53.4631, -2.2913], 'Arsenal': [51.5550, -0.1086],
+        'Liverpool': [53.4308, -2.9608], 'Chelsea': [51.4816, -0.1910],
+        'Tottenham': [51.6033, -0.0657], 'Manchester City': [53.4831, -2.2004],
+        'Everton': [53.4388, -2.9664], 'Newcastle Utd': [54.9756, -1.6217],
+        'West Ham': [51.5386, 0.0165], 'Aston Villa': [52.5092, -1.8840],
+        'Southampton': [50.9058, -1.3911], 'Blackburn': [53.7294, -2.4892],
+        'Leeds United': [53.7775, -1.5722], 'Leicester City': [52.6203, -1.1422],
+        'Fulham': [51.4748, -0.2216], 'Middlesbrough': [54.5781, -1.2174],
+        'Sunderland': [54.9144, -1.3882], 'Bolton': [53.5801, -2.5353],
+        'Crystal Palace': [51.3983, -0.0856], 'Stoke City': [52.9886, -2.1750],
+        'West Brom': [52.5091, -1.9635], 'Norwich City': [52.6220, 1.3090],
+        'Coventry City': [52.4480, -1.4951], 'Wolves': [52.5900, -2.1300],
+        'Sheffield Weds': [53.4116, -1.5008], 'Wimbledon': [51.4184, -0.2043],
+        'Charlton Ath': [51.4866, 0.0365], 'Portsmouth': [50.7964, -1.0636],
+        'Burnley': [53.7897, -2.2309],
+        'QPR': [51.5090, -0.2321], 'Birmingham City': [52.4750, -1.8684],
+        'Derby County': [52.9151, -1.4478], 'Wigan Athletic': [53.5476, -2.6532],
+        'Watford': [51.6498, -0.4015], "Nott'ham Forest": [52.9399, -1.1329],
+        'Bournemouth': [50.7352, -1.8380], 'Sheffield Utd': [53.3703, -1.4715],
+        'Brighton': [50.8616, -0.0837], 'Ipswich Town': [52.0595, 1.1465],
+        'Hull City': [53.7466, -0.3676], 'Reading': [51.4220, -0.9826],
+        'Brentford': [51.4900, -0.2880], 'Oldham Athletic': [53.5556, -2.1284],
+         'Bradford City': [53.7890, -1.7605],
+        'Huddersfield': [53.6543, -1.7686], 'Barnsley': [53.5526, -1.4693],
+        'Blackpool': [53.8048, -3.0486], 'Swindon Town': [51.5584, -1.7686]
+      };
+      
+      Promise.all([
+        d3.json("uk.json"),
+        d3.csv("premier-league-matches.csv", d3.autoType)
+      ]).then(([mapData, raw]) => {
+        const winMap = new Map();
+      
+        raw.forEach(row => {
+          if (!row.FTR || !row.Home || !row.Away) return;
+          const home = row.Home.trim();
+          const away = row.Away.trim();
+      
+          if (!winMap.has(home)) winMap.set(home, { H: 0, A: 0, T: home });
+          if (!winMap.has(away)) winMap.set(away, { H: 0, A: 0, T: away });
+      
+          if (row.FTR === 'H') winMap.get(home).H++;
+          if (row.FTR === 'A') winMap.get(away).A++;
+        });
+      
+        const teamStats = Array.from(winMap.values())
+          .map(team => {
+            const [lat, lon] = teamCoords[team.T] || [null, null];
+            return lat ? {
+              Team: team.T,
+              HomeWins: team.H,
+              AwayWins: team.A,
+              NetWinDiff: team.H - team.A,
+              AbsDiff: Math.abs(team.H - team.A),
+              Lat: lat,
+              Lon: lon
+            } : null;
+          })
+          .filter(Boolean);
+      
+        const uk = topojson.feature(mapData, mapData.objects.UK || Object.values(mapData.objects)[0]);
+      
+
+        svg3.append("g")
+  .selectAll("path")
+  .data(uk.features)
+  .join("path")
+  .attr("d", path)
+  .attr("fill", "#e0e0e0")
+  .attr("stroke", "#aaa");
+
+  svg3.append("g")
+  .selectAll("circle")
+  .data(teamStats)
+  .join("circle")
+  .attr("cx", d => projection([d.Lon, d.Lat])[0])
+  .attr("cy", d => projection([d.Lon, d.Lat])[1])
+  .attr("r", d => radius(d.AbsDiff))
+  .attr("fill", d => color3(d.NetWinDiff))
+  .attr("stroke", "#000")
+  .attr("opacity", 0.85)
+  .style("cursor", "pointer")
+  .on("mouseover", (event, d) => {
+    tooltip3.transition().duration(150).style("opacity", 1);
+    tooltip3.html(`<strong>${d.Team}</strong><br>Home: ${d.HomeWins}<br>Away: ${d.AwayWins}<br>Net: ${d.NetWinDiff}`)
+      .style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 28) + "px");
+  })
+  .on("mouseout", () => tooltip3.transition().duration(200).style("opacity", 0))
+  .on("click", (event, d) => renderClubTrend(d.Team));
+
+// Legend gradient bar
+const defs = svg.append("defs");
+const gradient = defs.append("linearGradient")
+  .attr("id", "color-gradient")
+  .attr("x1", "0%")
+  .attr("x2", "100%")
+  .attr("y1", "0%")
+  .attr("y2", "0%");
+
+gradient.selectAll("stop")
+  .data([
+    { offset: "0%", color: color(-50) },
+    { offset: "50%", color: color(0) },
+    { offset: "100%", color: color(50) }
+  ])
+  .join("stop")
+  .attr("offset", d => d.offset)
+  .attr("stop-color", d => d.color);
+
+  svg3.append("rect")
+  .attr("x", 20)
+  .attr("y", height - 40)
+  .attr("width", 200)
+  .attr("height", 12)
+  .style("fill", "url(#color-gradient)");
+
+  svg3.append("text")
+  .attr("x", 20)
+  .attr("y", height - 45)
+  .text("Net Home–Away Win Difference")
+  .style("font-size", "12px");
+
+  svg3.append("text")
+  .attr("x", 20)
+  .attr("y", height - 10)
+  .text("More Away Wins")
+  .style("font-size", "11px")
+  .style("fill", color(-50));
+
+  svg3.append("text")
+  .attr("x", 215)
+  .attr("y", height - 10)
+  .text("More Home Wins")
+  .style("font-size", "11px")
+  .style("text-anchor", "end")
+  .style("fill", color(50));
+});function closeClubChart() {
+d3.select("#club-line-card")
+  .transition()
+  .duration(400)
+  .style("opacity", 0)
+  .on("end", () => d3.select("#club-line-card").style("display", "none").style("opacity", 1));
+}
+
+function renderClubTrend(teamName) {
+  const card = d3.select("#club-line-card");
+  card.style("display", "block");
+  d3.select("#club-line-title").text(`${teamName} Season Win Balance`);
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+  d3.csv("premier-league-matches.csv", d3.autoType).then(data => {
+    const seasons = d3.rollup(data, v => {
+      const homeWins = v.filter(d => d.Home === teamName && d.FTR === 'H').length;
+      const awayWins = v.filter(d => d.Away === teamName && d.FTR === 'A').length;
+      return {
+        season: v[0].Season_End_Year,
+        diff: homeWins - awayWins
+      };
+    }, d => d.Season_End_Year);
+
+    const points = Array.from(seasons, ([season, d]) => ({ season: +season, diff: d.diff }))
+      .sort((a, b) => a.season - b.season);
+
+    const svg = d3.select("#club-line-chart");
+    svg.selectAll("*").remove();
+
+    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+    const w = +svg.attr("width") - margin.left - margin.right;
+    const h = +svg.attr("height") - margin.top - margin.bottom;
+
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scaleLinear()
+      .domain(d3.extent(points, d => d.season))
+      .range([0, w]);
+
+    const y = d3.scaleLinear()
+      .domain(d3.extent(points, d => d.diff)).nice()
+      .range([h, 0]);
+
+    g.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(x).tickFormat(d3.format("d")));
+    g.append("g").call(d3.axisLeft(y));
+
+    // Animated line
+    const path = g.append("path")
+      .datum(points)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 2)
+      .attr("d", d3.line().x(d => x(d.season)).y(d => y(d.diff)));
+
+    const totalLength = path.node().getTotalLength();
+    path
+      .attr("stroke-dasharray", `${totalLength} ${totalLength}`)
+      .attr("stroke-dashoffset", totalLength)
+      .transition()
+      .duration(1000)
+      .ease(d3.easeLinear)
+      .attr("stroke-dashoffset", 0);
+
+    const tooltip4 = d3.select("body").append("div")
+      .attr("class", "tooltip tooltip4")
+      .style("opacity", 0);
+
+    g.selectAll("circle")
+      .data(points)
+      .enter()
+      .append("circle")
+      .attr("cx", d => x(d.season))
+      .attr("cy", d => y(d.diff))
+      .attr("r", 4)
+      .attr("fill", "steelblue")
+      .on("mouseover", (event, d) => {
+        tooltip4.transition().duration(150).style("opacity", 1);
+        tooltip4
+          .html(`<strong>${teamName}</strong><br>Season: ${d.season}<br>Net Win Diff: ${d.diff}`)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", () => tooltip4.transition().duration(200).style("opacity", 0));
+  });
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.5/typed.min.js"
+        integrity="sha512-1KbKusm/hAtkX5FScVR5G36wodIMnVd/aP04af06iyQTkD17szAMGNmxfNH+tEuFp3Og/P5G32L1qEC47CZbUQ=="
+        crossorigin="anonymous"></script>
+<script>
+  var typed = new Typed('#typed', {
+    stringsElement: '#typed-strings',
+    backSpeed:50,
+    typeSpeed:60,
+    loop:true,
+  });
+</script>
+</body>
+</html>
