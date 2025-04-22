@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>D3 Visualizations - Saksham</title>
+  <title>K24008217 - Introduction to Data Visualization</title>
+  <meta name="author" content="Saksham Checker">
+  <meta name="description" content="Interactive visualizations of the English Premier League using D3.js. Explore team trends, relegation flows, and home-away win balance.">
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
@@ -22,6 +24,7 @@
       text-align: center;
       background: #000;
       color: white;
+      cursor: pointer;
     }
     .visualizations {
       padding: 2rem;
@@ -82,12 +85,49 @@
     }
     @import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
 
+    .info-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #ffc107;
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+}
+
+.info-icon:hover + .tooltip-box {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.tooltip-box {
+  position: absolute;
+  top: 3rem;
+  right: 1rem;
+  background: #fffbe6;
+  border: 1px solid #ffc107;
+  padding: 12px;
+  font-size: 13px;
+  max-width: 250px;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+}
 
 .landing {
   width: 100vw;
   min-height: 50vh;
-  background: #003140;
-  color: white;
+  background: linear-gradient(135deg, #f2e3d5, #ffd8a8); /* warm paper feel */
+  color: #2e1b0e; /* rich brown text */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -111,48 +151,61 @@
   align-items: center;
   justify-content: center;
 }
-
 .landing .container .h1 {
-  background: #003140;
+  background: #e46e50; /* softer brick red */
   padding: 20px 15px;
-  border-radius: 10px;
-  box-shadow: 3px 3px 15px #025872a2, -3px -3px 15px #000,
-              inset 3px 3px 10px #ffffff10, inset -3px -3px 15px #00000033;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 0 5px #f7c476;
   margin-bottom: 20px;
   text-align: center;
 }
 
 .landing .container .h1 a {
-  font-size: 1em;
-  color: black;
-  background: white;
-  padding: 8px;
-  border-radius: 8px;
-  box-shadow: -5px -5px 5px #ffffff3d, 5px 5px 10px #00000059;
+  font-size: 1.3em;
+  color: #2b1600; /* darker text for contrast */
+  background: #ffd85e; /* warm yellow-gold */
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 0 #fff8db;
+  box-shadow: inset 0 0 0 2px #ab3c1a, 3px 3px 6px rgba(0,0,0,0.3);
   text-decoration: none;
+  transition: transform 0.2s ease;
 }
 
+.landing .container .h1 a:hover {
+  transform: scale(1.04);
+  box-shadow: inset 0 0 0 2px #872e14, 4px 4px 10px rgba(0,0,0,0.4);
+}
 .typed-wrapper {
   font-size: 1.2em;
   text-align: center;
   margin-top: -10px;
+  font-family: "Arial Black", sans-serif;
+  color: #6c2e1f;
 }
 
 #typed {
   margin-left: 5px;
+  color: #b22222; /* firebrick red */
 }
 
 .footer {
-  background: #080808;
+  background: #5e3023; /* dark warm brown */
   text-align: center;
-  color: whitesmoke;
+  color: #ffe9c6;
   width: 100%;
   padding-top: 100px;
   padding-bottom: 40px;
 }
 
 .footer a {
-  color: #1eff00;
+  color: #ffb347;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-decoration: none;
 }
 
 
@@ -176,10 +229,15 @@
       </div>
       <div class="typed-wrapper">
         <div id="typed-strings">
-          <p>Statistics</p>
-          <p>Goals</p>
-          <p>Matches</p>
-          <p>Football</p>
+          <p>Statistics 📈</p>
+          <p>Goals 🥅</p>
+          <p>Matches🔥</p>
+          <p>Football ⚽</p>
+          <p>Standings 🧮</p>
+          <p>Fixtures 🗓️</p>
+          <p>Relegation ⚠️</p>
+          <p>Promotion 🚀</p>
+          <p>Transfers 🔁</p>
         </div>
         <span id="typed"></span>
       </div>
@@ -189,6 +247,13 @@
 
   <section class="visualizations">
       <div class="viz-card">
+        <div style="position: relative; width: 100%;">
+          <button class="info-icon">i</button>
+          <div class="tooltip-box">
+            <strong>How to Use:</strong><br>
+            Use the dropdown to change the metric (e.g., position, points). Click on a team in the legend to toggle visibility. Buttons let you reset or highlight the Big 6.
+          </div>
+        </div>
         <h3>Premier League Team Trends (2014–2023)</h3>
         <p>
         This interactive line chart visualizes the seasonal performance of top Premier League teams from 2014 to 2023. It helps users explore trends in key metrics like league position, total points, goals scored, and wins.
@@ -220,9 +285,18 @@
           </select>
         </div>
         <div id="viz1" class="viz-container" style="height: 500px;"></div>
+       
     </div>
 
     <div class="viz-card">
+      <div style="position: relative; width: 100%;">
+        <button class="info-icon">i</button>
+        <div class="tooltip-box">
+          <strong>How to Use:</strong><br>
+          Use the slider to change season grouping. Hover over the Sankey links to see team flow info. Groups show survival or return status.
+        </div>
+      </div>
+      
       <h3>Relegation and Return Flow</h3>
 <p>
 This Sankey diagram tracks teams that entered the relegation zone and their long-term outcomes—whether they returned to the league, survived, or remained relegated. It reveals patterns in promotion and survival across grouped seasons.
@@ -234,13 +308,13 @@ This Sankey diagram tracks teams that entered the relegation zone and their long
 <b>How to Use:</b> Adjust the grouping slider to change how seasons are bundled. Hover over links to see team counts and transition flows. Each node and path reflects the outcome of teams during and after relegation.
 </p>
 <p>
-<b>Data Source:</b> Derived from match results data from <a href="https://www.football-data.co.uk/" target="_blank">football-data.co.uk</a> and custom relegation logic. Visualization adapted from the official <a href="https://observablehq.com/@d3/sankey-diagram" target="_blank">D3 Sankey example</a>.
+   Visualization adapted from the official <a href="https://observablehq.com/@d3/sankey-diagram" target="_blank">D3 Sankey example</a>.
 </p>
 
       <div class="slider-container">
         <label for="group-slider"><strong>Group by window (years): </strong></label>
-        <input type="range" id="group-slider" min="2" max="8" value="4" step="1">
-        <span id="slider-value">4</span> years
+        <input type="range" id="group-slider" min="2" max="8" value="5" step="1">
+        <span id="slider-value">5</span> years
       </div>
       <svg id="viz2" width="1000" height="500" style="margin-bottom: 1rem;"></svg>
       <div class="tooltip tooltip2" id="sankey-tooltip" style="opacity: 0;"></div>
@@ -253,7 +327,15 @@ This Sankey diagram tracks teams that entered the relegation zone and their long
     </div>
 
     <div class="viz-card">
-      <h3>Home vs Away Win Balance (UK Map)</h3>
+      <div style="position: relative; width: 100%;">
+        <button class="info-icon">i</button>
+        <div class="tooltip-box">
+          <strong>How to Use:</strong><br>
+          Hover on bubbles to view win stats. Click a bubble to open a mini line chart of that club’s home-away win trend.
+        </div>
+      </div>
+      
+      <h3>Home vs Away Win Balance</h3>
 <p>
 This geographical map uses bubbles to represent the imbalance between home and away wins for each club. The map reflects team location and home-ground advantage or weakness over multiple seasons.
 </p>
@@ -264,7 +346,7 @@ This geographical map uses bubbles to represent the imbalance between home and a
 <b>How to Use:</b> Hover over a bubble to see home and away win totals. Click on a bubble to open a line chart showing that team’s win imbalance trend season-by-season.
 </p>
 <p>
-<b>Data Source:</b> Match results parsed from <a href="https://www.football-data.co.uk/" target="_blank">football-data.co.uk</a>. Club coordinates were manually mapped based on stadium locations.Map rendering adapted from D3’s UK map projection and bubble overlay examples: <a href="https://observablehq.com/@d3/bubble-map" target="_blank">Bubble Map Example</a>. Stadium coordinates were manually mapped and win balance logic implemented from scratch.
+Club coordinates were manually mapped based on stadium locations.Map rendering adapted from D3’s UK map projection and bubble overlay examples: <a href="https://observablehq.com/@d3/bubble-map" target="_blank">Bubble Map Example</a>. Stadium coordinates were manually mapped and win balance logic implemented from scratch.
 
 </p>
 
