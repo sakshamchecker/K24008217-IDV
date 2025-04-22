@@ -262,10 +262,7 @@
         <b>Data Processing:</b> Team performance data is aggregated per season from the original Premier League standings CSV. The metrics are dynamically extracted and rendered using D3’s line generator. Teams are grouped based on frequency of appearance and prominence (e.g., the Big 6).
         </p>
         <p>
-        <b>How to Use:</b> Use the dropdown to change the metric being visualized (e.g., position, points, goals). Click on a team in the legend to toggle its visibility. Use the buttons to show all, highlight the Big 6, or reset.
-        </p>
-        <p>
-          <b>Data Processing:</b> Raw season-level CSV data is parsed directly in-browser using D3.js. Top teams are determined based on their appearance frequency. The selected metric is dynamically applied to draw lines for each team using D3’s line generator. No external preprocessing was used—everything is computed and rendered interactively on the client side.Visualization adapted from the multi-series line chart example on Observable: <a href="https://observablehq.com/@d3/multi-line-chart" target="_blank">Multi-Line Chart Example</a>. Interaction and team filtering features have been customized for the Premier League dataset.
+           Raw season-level CSV data is parsed directly in-browser using D3.js. Top teams are determined based on their appearance frequency. The selected metric is dynamically applied to draw lines for each team using D3’s line generator. No external preprocessing was used—everything is computed and rendered interactively on the client side.Visualization adapted from the multi-series line chart example on Observable: <a href="https://observablehq.com/@d3/multi-line-chart" target="_blank">Multi-Line Chart Example</a>. Interaction and team filtering features have been customized for the Premier League dataset.
 
         </p>
         <div style="margin-bottom: 1rem;">
@@ -305,9 +302,6 @@ This Sankey diagram tracks teams that entered the relegation zone and their long
 <b>Data Processing:</b> Weekly rankings were simulated from match-level data to identify teams in the relegation zone (positions 18–20). Final standings were used to label teams as relegated or not. Grouping logic aggregates these into intervals (e.g., every 4 seasons).
 </p>
 <p>
-<b>How to Use:</b> Adjust the grouping slider to change how seasons are bundled. Hover over links to see team counts and transition flows. Each node and path reflects the outcome of teams during and after relegation.
-</p>
-<p>
    Visualization adapted from the official <a href="https://observablehq.com/@d3/sankey-diagram" target="_blank">D3 Sankey example</a>.
 </p>
 
@@ -342,9 +336,7 @@ This geographical map uses bubbles to represent the imbalance between home and a
 <p>
 <b>Data Processing:</b> Home and away wins were tallied for each club from the match-level data. The net win difference was calculated (Home Wins – Away Wins), and mapped to size and color using a diverging scale (red = home dominance, blue = away dominance).
 </p>
-<p>
-<b>How to Use:</b> Hover over a bubble to see home and away win totals. Click on a bubble to open a line chart showing that team’s win imbalance trend season-by-season.
-</p>
+
 <p>
 Club coordinates were manually mapped based on stadium locations.Map rendering adapted from D3’s UK map projection and bubble overlay examples: <a href="https://observablehq.com/@d3/bubble-map" target="_blank">Bubble Map Example</a>. Stadium coordinates were manually mapped and win balance logic implemented from scratch.
 
