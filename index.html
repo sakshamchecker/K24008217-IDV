@@ -262,13 +262,16 @@
         <b>Data Processing:</b> Team performance data is aggregated per season from the original Premier League standings CSV. The metrics are dynamically extracted and rendered using D3’s line generator. Teams are grouped based on frequency of appearance and prominence (e.g., the Big 6).
         </p>
         <p>
+          <b>Data Source</b> Dataset of Premier League matches from 1993 to 2023, including match results and team standings from Kaggle - <a href="https://www.kaggle.com/datasets/evangower/english-premier-league-standings" target="_blank">Premier League Rankings Dataset</a>.
+        </p>
+        <p>
            Raw season-level CSV data is parsed directly in-browser using D3.js. Top teams are determined based on their appearance frequency. The selected metric is dynamically applied to draw lines for each team using D3’s line generator. No external preprocessing was used—everything is computed and rendered interactively on the client side.Visualization adapted from the multi-series line chart example on Observable: <a href="https://observablehq.com/@d3/multi-line-chart" target="_blank">Multi-Line Chart Example</a>. Interaction and team filtering features have been customized for the Premier League dataset.
 
         </p>
         <div style="margin-bottom: 1rem;">
           <div style="margin-bottom: 1rem;">
             <button id="show-all">Show All</button>
-            <button id="show-top6">Show Top 6</button>
+            <button id="show-top6">Show Big 6</button>
             <button id="hide-all">Hide All</button>
           </div>
           <label for="metric-select">Select Metric:</label>
@@ -300,6 +303,9 @@ This Sankey diagram tracks teams that entered the relegation zone and their long
 </p>
 <p>
 <b>Data Processing:</b> Weekly rankings were simulated from match-level data to identify teams in the relegation zone (positions 18–20). Final standings were used to label teams as relegated or not. Grouping logic aggregates these into intervals (e.g., every 4 seasons).
+</p>
+<p>
+  <b>Data Source</b> Week by week match data from 1993 to 2023, including match results and team standings from Kaggle - <a href="https://www.kaggle.com/datasets/evangower/premier-league-matches-19922022" target="_blank">Weekly Matches Dataset</a>.
 </p>
 <p>
    Visualization adapted from the official <a href="https://observablehq.com/@d3/sankey-diagram" target="_blank">D3 Sankey example</a>.
@@ -336,7 +342,9 @@ This geographical map uses bubbles to represent the imbalance between home and a
 <p>
 <b>Data Processing:</b> Home and away wins were tallied for each club from the match-level data. The net win difference was calculated (Home Wins – Away Wins), and mapped to size and color using a diverging scale (red = home dominance, blue = away dominance).
 </p>
-
+<p>
+<b>Data Source</b> Week by week match data from 1993 to 2023, including match results and team standings from Kaggle - <a href="https://www.kaggle.com/datasets/evangower/premier-league-matches-19922022" target="_blank">Weekly Matches Dataset</a>.
+</p>
 <p>
 Club coordinates were manually mapped based on stadium locations.Map rendering adapted from D3’s UK map projection and bubble overlay examples: <a href="https://observablehq.com/@d3/bubble-map" target="_blank">Bubble Map Example</a>. Stadium coordinates were manually mapped and win balance logic implemented from scratch.
 
@@ -713,8 +721,7 @@ d3.csv("premier-league-matches.csv", d3.autoType).then(data => {
       if (name === "Survived") return "#2ca02c";
       if (name.startsWith("Returned")) return "#1f77b4";
       if (name === "Never Returned") return "#888";
-      if (/^\\d{4}–\\d{4}$/.test(name)) return "#ff7f0e";
-      return "#999";
+      return "#ff7f0e";
     };
 
     
